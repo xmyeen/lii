@@ -209,9 +209,9 @@ RUN \\
     # 执行安装脚本
     curl -ssL http://{http_server_addr}:{http_server_port}/{installation_file} | sh; \\
     # 安装启动脚本
-    dirname {entrypoint_script_path} | xargs mkdir -p; \\
-    basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://127.0.0.1:{http_server_port}/{{}} | sh; \\
-    chmod 755 {entrypoint_script_path}; \\
+    #dirname {entrypoint_script_path} | xargs mkdir -p; \\
+    #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \\
+    #chmod 755 {entrypoint_script_path}; \\
     # 设置systemd可执行
     (cd /lib/systemd/system/sysinit.target.wants/; \\
     for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \\
