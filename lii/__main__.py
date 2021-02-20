@@ -7,6 +7,7 @@ APP_CONFIGURATION_DEF = dict(
     name = 'lii', version = 'latest', 
     image_from = "centos:7",
     image_maintainer = "xmyeen xmyeen@sina.com.cn",
+    host = '127.0.0.1',
     port = 80, 
     isdebug = False
 )
@@ -18,6 +19,7 @@ python -m lii [option]
 --image-maintainer=<str>   Specify image maintainer. Default: '{APP_CONFIGURATION_DEF["image_maintainer"]}'
 --name=<str>               Specify name. Default: '{APP_CONFIGURATION_DEF["name"]}'
 --version=<x.x.x>          Specify version. Default: '{APP_CONFIGURATION_DEF["version"]}'
+--host=<address>           Specify server address. Default: '{APP_CONFIGURATION_DEF["host"]}'
 --port=<number>            Specify server port. Default: {APP_CONFIGURATION_DEF["port"]}
 --localhub=<path>          Specify local hub path
 --debug                    Run as debug
@@ -37,6 +39,8 @@ try:
             APP_CONFIGURATION_DEF.update(name = value)
         elif name in ("--version"):
             APP_CONFIGURATION_DEF.update(version = value)
+        elif name in ("--host"):
+            APP_CONFIGURATION_DEF.update(host = value)
         elif name in ("--port"):
             APP_CONFIGURATION_DEF.update(port = value)
         elif name in ("--debug"):
@@ -53,7 +57,12 @@ try:
         version = APP_CONFIGURATION_DEF['version']
     )
 
-    inst = Installer(image_prof, server_port = APP_CONFIGURATION_DEF['port'], localhub = APP_CONFIGURATION_DEF.get('localhub'))
+    inst = Installer(
+        image_prof,
+        server_addr = APP_CONFIGURATION_DEF['host'],
+        server_port = APP_CONFIGURATION_DEF['port'],
+        localhub = APP_CONFIGURATION_DEF.get('localhub')
+    )
 
     if APP_CONFIGURATION_DEF.get('isdebug'):
         inst.exec()

@@ -23,9 +23,10 @@ class Installer(object):
     INSTALLATION_SCRIPT_NAME = 'inst.sh'
     ENTRYPOINT_FILE_NAME = 'app-entrypoint'
 
-    def __init__(self, image_prof:ImageProf, server_port, localhub = None):
+    def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub = None):
         self.__image_prof = image_prof
 
+        self.__server_addr = server_addr
         self.__server_port = server_port 
 
         self.__localhub = localhub
@@ -51,6 +52,7 @@ class Installer(object):
             image_from = self.__image_prof.image_from,
             image_maintainer = self.__image_prof.image_maintainer,
             image_name = self.__image_prof.name,
+            http_server_addr = self.__server_addr,
             http_server_port = self.__server_port,
             installation_file = self.INSTALLATION_SCRIPT_NAME,
             entrypoint_script_path = f'/sbin/{self.ENTRYPOINT_FILE_NAME}'
@@ -128,12 +130,12 @@ class Installer(object):
         if not workdir or not os.path.exists(workdir):
             if dockerfile_content: print(dockerfile_content)
             if installation_content: print(installation_content)
-        elif os.path.exists(workdir) and docker_file_content and installation_content:
+        elif os.path.exists(workdir) and dockerfile_content and installation_content:
             dockerfile_path = os.path.join(workdir, self.DOCKERFILE_NAME)
             installation_script_path = os.path.join(workdir, self.INSTALLATION_SCRIPT_NAME)
             
             with open(dockerfile_path, 'w', encoding='utf-8') as w1, open(installation_script_path, 'w', encoding='utf-8') as w2:
-                w1.write(docker_file_content)
+                w1.write(dockerfile_content)
                 w2.write(installation_content)
 
             p = subprocess.Popen([sys.executable, '-m', 'http.server', self.__server_port], cwd = workdir)
@@ -147,7 +149,7 @@ class Installer(object):
                     '--build-arg HTTP_PROXY=${HTTP_PROXY}',
                     '--build-arg HTTPS_PROXY=${HTTPS_PROXY}',
                     # f'--build-arg builder_sh={os.path.basename(software_script_f.name)}',
-                    f'-t {self.__image_prof.name}:{self.__image_prof.latest}',
+                    f'-t {self.__image_prof.name}:{self.__image_prof.version}',
                     f'-f {dockerfile_path}',
                     "."
                 ])
