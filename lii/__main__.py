@@ -26,7 +26,7 @@ python -m lii [option]
 '''.strip()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "h", ["help", "image-from=", "image-maintainer=", "name=", "version=", "port=", "debug", "localhub="])
+    opts, args = getopt.getopt(sys.argv[1:], "h", ["help", "image-from=", "image-maintainer=", "name=", "version=", "host=", "port=", "debug", "localhub="])
     for name, value in opts:
         if name in ("-h", "--help"):
             print(USAGE_DEF)

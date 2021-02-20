@@ -17,8 +17,8 @@ class OpenjdkInstallation(BasicAppInstallation):
             'cat >> ${HOME}/.bashrc << EOF',
             '# openjdk',
             f'export JAVA_HOME=/usr/lib/jvm/java-{self.prof.version}-openjdk/',
-            'export CLASSPATH=.:\\${{JAVA_HOME}}/lib:\\${{JAVA_HOME}}/lib/dt.jar:\\${{JAVA_HOME}}/lib/tools.jar',
-            'export PATH=\\${{PATH}}:\\${{JAVA_HOME}}/bin',
+            'export CLASSPATH=.:\\${JAVA_HOME}/lib:\\${JAVA_HOME}/lib/dt.jar:\\${JAVA_HOME}/lib/tools.jar',
+            'export PATH=\\${PATH}:\\${JAVA_HOME}/bin',
             'EOF'
         ]
 
