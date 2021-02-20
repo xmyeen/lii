@@ -1,7 +1,7 @@
 import configparser, subprocess, os, sys, warnings
 from urllib.parse import urlparse
 from functools import reduce
-from typing import Dict,Any
+from typing import Dict,Any, List
 from .datatype.app_prof import AppProf
 from .datatype.image_prof import ImageProf
 from .datatype.installation import APP_INSTALLATION_TYPES, GROUP_INSTALLATION_TYPES, BasicAppInstallation, BasicGroupInstallation
@@ -23,7 +23,7 @@ class Installer(object):
     INSTALLATION_SCRIPT_NAME = 'inst.sh'
     ENTRYPOINT_FILE_NAME = 'app-entrypoint'
 
-    def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub = None):
+    def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub = None, *excluding_group_names:List[str]):
         self.__image_prof = image_prof
 
         self.__server_addr = server_addr
@@ -31,9 +31,9 @@ class Installer(object):
 
         self.__localhub = localhub
 
-        self.__excluding_group_names = []
-
         self.__app_profs = []
+
+        self.__excluding_group_names = excluding_group_names
 
     # def __get_internal_mirror(self, name):
     #     return f'{self.get_internal_hub()}/{name}'

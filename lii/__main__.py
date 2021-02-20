@@ -9,7 +9,8 @@ APP_CONFIGURATION_DEF = dict(
     image_maintainer = "xmyeen xmyeen@sina.com.cn",
     host = '127.0.0.1',
     port = 80, 
-    isdebug = False
+    isdebug = False,
+    exclude = ""
 )
 
 USAGE_DEF = f'''
@@ -23,10 +24,11 @@ python -m lii [option]
 --port=<number>            Specify server port. Default: {APP_CONFIGURATION_DEF["port"]}
 --localhub=<path>          Specify local hub path
 --debug                    Run as debug
+--exclude                  Excluding groups. Such as "A,B,C". Default: {APP_CONFIGURATION_DEF["exclude"]}
 '''.strip()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "h", ["help", "image-from=", "image-maintainer=", "name=", "version=", "host=", "port=", "debug", "localhub="])
+    opts, args = getopt.getopt(sys.argv[1:], "h", ["help", "image-from=", "image-maintainer=", "name=", "version=", "host=", "port=", "debug", "localhub=", "exclude="])
     for name, value in opts:
         if name in ("-h", "--help"):
             print(USAGE_DEF)
@@ -47,6 +49,8 @@ try:
             APP_CONFIGURATION_DEF.update(isdebug = True)
         elif name in ("--localhub"):
             APP_CONFIGURATION_DEF.update(localhub = value)
+        elif name in ("--exclude"):
+            APP_CONFIGURATION_DEF.update(exclude = value)
 
     scan_module(__loader__.name.replace('__main__', "sh.installation"))
 
@@ -61,7 +65,8 @@ try:
         image_prof,
         server_addr = APP_CONFIGURATION_DEF['host'],
         server_port = APP_CONFIGURATION_DEF['port'],
-        localhub = APP_CONFIGURATION_DEF.get('localhub')
+        localhub = APP_CONFIGURATION_DEF.get('localhub'),
+        *APP_CONFIGURATION_DEF.get('exclude').split(',')
     )
 
     if APP_CONFIGURATION_DEF.get('isdebug'):

@@ -206,12 +206,6 @@ RUN \\
     # 将编译时间加入登录提示
     echo "{image_name} - built in `date "+%Y%m%dT%H%M%S%z"`" >> /etc/motd; \\
     # 将环境变量写到/etc/profile里面，保证SSH登录的时候能够正确使用
-    # 执行安装脚本
-    curl -ssL http://{http_server_addr}:{http_server_port}/{installation_file} | sh; \\
-    # 安装启动脚本
-    #dirname {entrypoint_script_path} | xargs mkdir -p; \\
-    #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \\
-    #chmod 755 {entrypoint_script_path}; \\
     # 设置systemd可执行
     (cd /lib/systemd/system/sysinit.target.wants/; \\
     for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \\
@@ -221,7 +215,15 @@ RUN \\
     rm -f /lib/systemd/system/sockets.target.wants/*udev*; \\
     rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \\
     rm -f /lib/systemd/system/basic.target.wants/*; \\
-    rm -f /lib/systemd/system/anaconda.target.wants/*;
+    rm -f /lib/systemd/system/anaconda.target.wants/*; \\
+    # 执行安装脚本
+    curl -ssL http://{http_server_addr}:{http_server_port}/{installation_file} | sh; \\
+    # 安装启动脚本
+    #dirname {entrypoint_script_path} | xargs mkdir -p; \\
+    #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \\
+    #chmod 755 {entrypoint_script_path}; \\
+    ls -l {entrypoint_script_path}
+    
 
 EXPOSE 22 80 8080
 
