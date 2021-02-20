@@ -41,7 +41,7 @@ class BasicAppInstallation(object):
 
         if self.__prof.install == InstallationMethodDefs.rpm.name:
             if rpm_name := self.__prof.extension.get('rpms'):
-                yums.append(rpm_name)
+                rpms.append(rpm_name)
             elif self.__prof.version:
                 rpms.append(f"{self.__prof.name}-{self.__prof.version}")
             else:

@@ -12,7 +12,7 @@ class PythonInstallation(BasicAppInstallation):
         lines = ['# python installation']
         with insert_download_content(lines, self) as catalog_dir:
             lines.extend([
-            f'cd {catalog_dir}',
+            f'cd {catalog_dir}/Python-*',
             f'./configure --prefix={self.home}',
             'make',
             'make install',

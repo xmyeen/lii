@@ -12,7 +12,7 @@ class GolangInstallation(BasicAppInstallation):
         lines = ['# golang installation']
         with insert_download_content(lines, self) as catalog_dir:
             lines.extend([
-            f'mv -f {catalog_dir} {self.home}',
+            f'mv -f {catalog_dir}/go {self.home}',
 
             'GO_WORKSPACE=${HOME}/gowork',
             'mkdir -p ${GO_WORKSPACE}',

@@ -27,7 +27,7 @@ def insert_download_content(lines:List[str], installation:BasicAppInstallation) 
     elif url.startswith('http'):
         lines.append(f"curl -skL -o {output_file} {url}")
 
-    tmpdir = f'{installation.building_work_dir}/b/{installation.prof.name}-{uuid.uuid4()}'
+    tmpdir = f'{installation.building_work_dir}/b'
     if output_file.endswith(CompressionDefs.XZ.value):
         lines.append(f"xz -d {output_file} &&")
         lines.append(f"tar -xvf {output_file[:-3]} -C {tmpdir} &&")

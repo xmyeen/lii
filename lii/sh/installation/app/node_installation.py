@@ -12,7 +12,7 @@ class NodeInstallation(BasicAppInstallation):
         lines = ['# node installation']
         with insert_download_content(lines, self) as catalog_dir:
             lines.extend([
-            f'mv -f {catalog_dir} {self.home}',
+            f'mv -f {catalog_dir}/node-*-linux-* {self.home}',
 
             'cat >> ${HOME}/.bashrc << EOF',
             '# node',
