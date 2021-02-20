@@ -63,9 +63,9 @@ try:
 
     inst = Installer(
         image_prof,
-        server_addr = APP_CONFIGURATION_DEF['host'],
-        server_port = APP_CONFIGURATION_DEF['port'],
-        localhub = APP_CONFIGURATION_DEF.get('localhub'),
+        APP_CONFIGURATION_DEF['host'],
+        APP_CONFIGURATION_DEF['port'],
+        APP_CONFIGURATION_DEF.get('localhub'),
         *APP_CONFIGURATION_DEF.get('exclude').split(',')
     )
 

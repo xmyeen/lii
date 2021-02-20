@@ -23,7 +23,7 @@ class Installer(object):
     INSTALLATION_SCRIPT_NAME = 'inst.sh'
     ENTRYPOINT_FILE_NAME = 'app-entrypoint'
 
-    def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub = None, *excluding_group_names:List[str]):
+    def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub, *excluding_group_names:List[str]):
         self.__image_prof = image_prof
 
         self.__server_addr = server_addr
