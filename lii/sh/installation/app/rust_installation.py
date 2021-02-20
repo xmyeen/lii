@@ -15,29 +15,29 @@ class RustInstallation(BasicAppInstallation):
         lines =  [
             '# rust installation',
 
-            'ENV_FILE="$HOME/.rust-env"',
+            'RUST_DIST_ENV="$HOME/.rust_rc"',
 
-            'cat >> $ENV_FILE << EOF',
-            '# rust'
+            'cat >> $RUST_DIST_ENV << EOF',
+            '# rust',
             f'export RUSTUP_DIST_SERVER=https://{RUSTUP_REGISTRY}/rust-static',
             f'export RUSTUP_UPDATE_ROOT=\\${{RUSTUP_DIST_SERVER}}/rustup',
             'EOF',
 
-            'source $ENV_FILE',
+            'source $RUST_DIST_ENV',
             'curl https://sh.rustup.rs -sSf | sh -s -- -y',
 
-            'cat $ENV_FILE >> ${HOME}/.bashrc',
+            'cat $RUST_DIST_ENV >> ${HOME}/.bashrc',
 
-            'cat >> $HOME/.cargo/config <<EOF',
+            'cat >> $HOME/.cargo/config << EOF',
             '[source.crates-io]',
             'registry = "https://github.com/rust-lang/crates.io-index"',
             f"replace-with = '{RUSTUP_REGISTRY_NAME}'",
-            f'[source.{RUSTUP_REGISTRY_NAME}]'
+            f'[source.{RUSTUP_REGISTRY_NAME}]',
             f"registry = 'git://{RUSTUP_REGISTRY}/crates.io-index'",
             'EOF',
 
-            'rm -f $ENV_FILE',
-            'unset ENV_FILE'
+            'rm -f $RUST_DIST_ENV',
+            'unset RUST_DIST_ENV'
         ]
 
         return '\n'.join(lines).strip()
