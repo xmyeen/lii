@@ -190,7 +190,7 @@ f'''
 group = toolkit
 install = {InstallationMethodDefs.rpm.name}
 version = 1.1.0
-rpms =  https://github.com/xmyeen/fvs/releases/download/{{version}}-beta.2/fvs-{{version}}-1.el7.noarch.rpm
+rpms =  https://github.com/xmyeen/fvs/releases/download/{{version}}-beta.1/fvs-{{version}}-1.el7.noarch.rpm
 '''
 ])
 }
