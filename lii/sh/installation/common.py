@@ -30,17 +30,17 @@ def insert_download_content(lines:List[str], installation:BasicAppInstallation) 
     tmpdir = f'{installation.building_work_dir}/b'
     if output_file.endswith(CompressionDefs.XZ.value):
         lines.append(f"xz -d {output_file} &&")
-        lines.append(f"tar -xvf {output_file[:-3]} -C {tmpdir} &&")
+        lines.append(f"tar -xf {output_file[:-3]} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.GZ.value):
-        lines.append(f"tar -zxvf {output_file} -C {tmpdir} &&")
+        lines.append(f"tar -zxf {output_file} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.BZ).value:
-        lines.append(f"tar -jxvf {output_file} -C {tmpdir} &&")
+        lines.append(f"tar -jxf {output_file} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.BZ2.value):
-        lines.append(f"tar -jxvf {output_file} -C {tmpdir} &&")
+        lines.append(f"tar -jxf {output_file} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.Z):
-        lines.append(f"tar -Zxvf {output_file} -C {tmpdir} &&")
+        lines.append(f"tar -Zxf {output_file} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.TAR.value):
-        lines.append(f"tar -xvf {output_file} -C {tmpdir} &&")
+        lines.append(f"tar -xf {output_file} -C {tmpdir} &&")
     elif output_file.endswith(CompressionDefs.ZIP.value):
         lines.append(f"unzip {output_file} -d {tmpdir} &&")
     

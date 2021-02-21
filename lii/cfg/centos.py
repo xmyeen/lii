@@ -250,9 +250,10 @@ curl -k -s -L -o /etc/yum.repos.d/netease.repo https://mirrors.163.com/.help/Cen
 yum makecache
 
 # language configuration
-echo "export LC_ALL=zh_CN.UTF-8"  >> /etc/locale.conf && 
+sed -i "s/override_install_langs/#override_install_langs/g" /etc/yum.conf &&
+echo "export LC_ALL=zh_CN.UTF-8" >> /etc/locale.conf && 
 yum install -y kde-l10n-Chinese && 
-yum -y reinstall glibc-common && 
+yum -q -y reinstall glibc-common && 
 localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
 
 cat >> ${{HOME}}/.bashrc <<EOF
