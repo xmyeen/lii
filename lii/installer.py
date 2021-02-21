@@ -21,7 +21,7 @@ INSTALLATION_WORK_DIRECTORY_DEF = '/tmp/installation-dir'
 class Installer(object):
     DOCKERFILE_NAME = 'dockerfile'
     INSTALLATION_SCRIPT_NAME = 'inst.sh'
-    ENTRYPOINT_FILE_NAME = 'app-entrypoint'
+    ENTRYPOINT_FILE_NAME = 'docker-entrypoint'
 
     def __init__(self, image_prof:ImageProf, server_addr, server_port, localhub, *excluding_group_names:List[str]):
         self.__image_prof = image_prof
@@ -55,7 +55,7 @@ class Installer(object):
             http_server_addr = self.__server_addr,
             http_server_port = self.__server_port,
             installation_file = self.INSTALLATION_SCRIPT_NAME,
-            entrypoint_script_path = f'/sbin/{self.ENTRYPOINT_FILE_NAME}'
+            entrypoint_script_path = f'/{self.ENTRYPOINT_FILE_NAME}'
         )
 
     def __gen_installation_content(self) -> str:

@@ -4,6 +4,8 @@ from ..common import insert_download_content
 from ....datatype.installation import BasicGroupInstallation, group_d
 
 AFTER_CONTENT_DEF = f'''
+#--- enable sshd
+systemctl enable sshd.service
 #--- ssh configuration
 mkdir -p /var/run/sshd
 echo "root:abc123" | chpasswd

@@ -222,7 +222,7 @@ RUN \\
     #dirname {entrypoint_script_path} | xargs mkdir -p; \\
     #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \\
     #chmod 755 {entrypoint_script_path}; \\
-    ls -l {entrypoint_script_path}
+    cat {entrypoint_script_path}
     
 
 EXPOSE 22 80 8080
@@ -271,7 +271,6 @@ source ${{HOME}}/.bashrc
 cat >> {entrypoint_script_path} << EOF
 #!/bin/sh
 cat /etc/motd
-systemctl enable sshd.service
 exec /usr/sbin/init
 EOF
 chmod +x {entrypoint_script_path}
@@ -287,8 +286,5 @@ chmod +x {entrypoint_script_path}
 # clear
 yum clean all
 rm -rf /tmp/*
-
-# finish
-echo "finish"
 '''
 }
