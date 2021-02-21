@@ -20,6 +20,10 @@ rpms = {{name}} {{name}}-devel
 [rpm-build]
 group = basic
 install = {InstallationMethodDefs.yum.name}
+
+[createrepo]
+group = basic
+install = {InstallationMethodDefs.yum.name}
 ''',
 
 #ssh组
@@ -137,7 +141,7 @@ rpms = {{name}}-devel
 [python]
 group = python-devel
 install = {InstallationMethodDefs.http.name}
-version = 3.8.2
+version = 3.9.2
 url =  https://www.python.org/ftp/python/{{version}}/Python-{{version}}.tar.xz
 ''',
 
@@ -146,7 +150,7 @@ f'''
 [node]
 group = javascript-devel
 install = {InstallationMethodDefs.http.name}
-version = 10.1.0
+version = 14.15.5
 url =  https://nodejs.org/dist/v{{version}}/node-v{{version}}-linux-x64.tar.xz
 ''',
 
@@ -185,8 +189,8 @@ f'''
 [fvs]
 group = toolkit
 install = {InstallationMethodDefs.rpm.name}
-version = 1.0.0
-rpms =  https://github.com/xmyeen/fvs/releases/download/{{version}}-beta.3/fvs-{{version}}-1.el7.noarch.rpm
+version = 1.1.0
+rpms =  https://github.com/xmyeen/fvs/releases/download/{{version}}-beta.2/fvs-{{version}}-1.el7.noarch.rpm
 '''
 ])
 }
@@ -204,7 +208,7 @@ LABEL description="多开发语言统一构建环境"
 
 RUN \\
     # 将编译时间加入登录提示
-    echo "{image_name} - built in `date "+%Y%m%dT%H%M%S%z"`" >> /etc/motd; \\
+    echo "{image_name} - built in `date "+%Y-%m-%dT%H:%M:%S%:z"`" >> /etc/motd; \\
     # 将环境变量写到/etc/profile里面，保证SSH登录的时候能够正确使用
     # 设置systemd可执行
     (cd /lib/systemd/system/sysinit.target.wants/; \\
@@ -222,7 +226,9 @@ RUN \\
     #dirname {entrypoint_script_path} | xargs mkdir -p; \\
     #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \\
     #chmod 755 {entrypoint_script_path}; \\
-    cat {entrypoint_script_path}
+    echo "--- show entry point" && \\
+    cat {entrypoint_script_path} && \\
+    echo "--- all done"
     
 
 EXPOSE 22 80 8080
