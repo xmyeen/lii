@@ -4,6 +4,10 @@ CENTOS_CONFIGURATION_DFLT_DEF = {
 "7": '\n'.join([
 #基本组
 f'''
+[sysvinit-tools]
+group = basic
+install = {InstallationMethodDefs.yum.name}
+
 [vim]
 group = basic
 install = {InstallationMethodDefs.yum.name}
@@ -183,6 +187,23 @@ rpms =  java-{{version}}-{{name}} java-{{version}}-{{name}}-devel
 group = java-devel
 install = {InstallationMethodDefs.yum.name}
 ''',
+
+#devops组
+# f'''
+# [github-runner]
+# group = ci
+# install = {InstallationMethodDefs.rpm.name}
+# version = 2.277.1
+# rpms =  https://github.com/actions/runner/releases/download/v{{version}}/actions-runner-linux-x64-{{version}}.tar.gz
+# ''',
+
+# f'''
+# [gitlab-runner]
+# group = ci
+# install = {InstallationMethodDefs.rpm.name}
+# version = 13.4.1
+# rpms =  https://gitlab-runner-downloads.s3.amazonaws.com/v{{version}}/rpm/gitlab-runner_amd64.rpm
+# ''',
 
 #小工具组
 f'''

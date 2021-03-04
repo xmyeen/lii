@@ -9,7 +9,7 @@ class RustInstallation(BasicAppInstallation):
         BasicAppInstallation.__init__(self, *args, **kwargs)
 
     def now(self):
-        RUSTUP_REGISTRY = "mirrors.sjtug.sjtu.edu.cn"
+        RUSTUP_REGISTRY = "mirrors.ustc.edu.cn"
         RUSTUP_REGISTRY_NAME = "utsc"
 
         lines =  [
