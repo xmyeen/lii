@@ -124,8 +124,8 @@ class Installer(object):
         installation_content_io.seek(0)
 
         with \
-        tempfile.NamedTemporaryFile('w', encoding='utf-8') as installation_script_io, \
-        tempfile.NamedTemporaryFile('w', encoding='utf-8') as entrypoint_script_io, \
+        open(os.path.join(workdir, '1.sh'), 'w', encoding='utf-8') as installation_script_io, \
+        open(os.path.join(workdir, '2.sh'), 'w', encoding='utf-8') as entrypoint_script_io, \
         tempfile.NamedTemporaryFile('w', encoding='utf-8') as dockerfile_io: 
 
             installation_script_io.write(
@@ -134,19 +134,22 @@ class Installer(object):
                     installation_content = installation_content_io.read()
                 )
             )
+            installation_script_io.flush()
 
             entrypoint_script_io.write(
                 self.__configurer.get_configuration(ProfileDefs.DOCKER_ENTRYPOINT)
             )
+            entrypoint_script_io.flush()
 
             dockerfile_io.write(
                 self.__configurer.get_configuration(ProfileDefs.DOCKER_DOCKERFILE).format(
                     image = self.__configurer.setting.get_image(),
-                    installation_script = installation_script_io.name,
-                    entrypoint_script = entrypoint_script_io.name,
+                    installation_script = os.path.basename(installation_script_io.name),
+                    entrypoint_script = os.path.basename(entrypoint_script_io.name),
                     installation_label = 'lii'
                 )
             )
+            dockerfile_io.flush()
 
             try:
                 cmdline = ' '.join([

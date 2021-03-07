@@ -11,7 +11,8 @@ def __cov_expression(v, exp):
     op, v2 = re.findall(r"([><=]+)\s*(\d+\.?\d*\.?\d*)", exp)[0]
     return v, op, v2
 
-def cov_version(v):
+def cov_version(ver):
+    v = str(ver)
     if re.fullmatch(f'\d+\.\d+\.\d+', v): return v
     elif re.fullmatch(f'\d+\.\d+', v): return f'{v}.0'
     elif re.fullmatch(f'\d+', v): return f'{v}.0.0'
