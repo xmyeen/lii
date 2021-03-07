@@ -19,7 +19,7 @@ class Setting(object):
     def get_image(self) -> Dict[str,str]:
         return dict(
             FROM = self.from_,
-            MAINTAINER = self.maintainer
+            MAINTAINER = self.maintainer,
             fullname = self.get_full_name()
         )
 

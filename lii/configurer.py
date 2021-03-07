@@ -19,8 +19,8 @@ then
   cat {LsbReleaseDefs.DEBIAN.value}  | awk -F'=' 'NR == 1 || NR == 2 {{print $2}}' | paste -sd "-"
 elif [ -e {LsbReleaseDefs.ALPINE.value} ]
 then 
-   awk '{{print "alpine" "-" $1'}} {LsbReleaseDefs.ALPINE.value}
-endif 
+   awk '{{print "alpine" "-" $1}}' {LsbReleaseDefs.ALPINE.value}
+fi 
 '''
 
 class Configurer(object):
@@ -67,7 +67,8 @@ class Configurer(object):
 
     def init(self):
         if not self.__lsb_release_name or not self.__lsb_release_version:
-            with tempfile.NamedTemporaryFile() as tf:
+            with tempfile.NamedTemporaryFile('w', encoding='utf-8') as tf:
+                tf.write('#!/bin/sh\n')
                 tf.write(LSB_LOOK_SCRIPTS_DEF)
                 lsb_release_str = subprocess.getoutput(f'docker run --rm -it -v {os.path.abspath(tf.name)}:/run.sh {self.setting.from_} sh /run.sh')
                 if not lsb_release_str:
