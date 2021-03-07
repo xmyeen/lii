@@ -1,100 +1,169 @@
-#!/env/Python
+# -*- coding:utf-8 -*-
+#!/usr/bin/env Python
 
 # from typing  import 
+import traceback
+from typing import Dict,Any,List
 from abc import ABCMeta, abstractclassmethod
 from ..en.installation import InstallationMethodDefs
-from .app_prof import AppProf
 
 APP_INSTALLATION_TYPES = {}
 GROUP_INSTALLATION_TYPES = {}
 
-class BasicAppInstallation(object):
+class BasicInstallation(object):
     def __init__(self):
         self.__home = None
-        self.__building_work_dir = None
-        self.__prof = None
+        self.__work_dir = None
+        # self.__configurer = None
+        self.__configuration = None
+        self.__previous_installation = None
+
+    @property
+    def name(self) -> str: return self.__configuration.get("name")
 
     def set_home(self, home:str): self.__home = home
     def get_home(self) -> str: return self.__home
-    home = property(get_home, set_home, None, '配置')
+    home = property(get_home, set_home, None, '部署目录')
 
-    def set_building_work_dir(self, building_work_dir:str): self.__building_work_dir = building_work_dir
-    def get_building_work_dir(self) -> str: return self.__building_work_dir
-    building_work_dir = property(get_building_work_dir, set_building_work_dir, None, '编译工作目录')
+    def set_work_dir(self, work_dir:str): self.__work_dir = work_dir
+    def get_work_dir(self) -> str: return self.__work_dir
+    work_dir = property(get_work_dir, set_work_dir, None, '工作目录')
 
-    def set_prof(self, prof:AppProf): self.__prof = prof
-    def get_prof(self) -> AppProf: return self.__prof
-    prof = property(get_prof, set_prof, None, '配置')
+    # def set_configurer(self, configurer): self.__configurer = configurer
+    # def get_configurer(self): return self.__configurer
+    # configurer = property(get_configurer, set_configurer, None, '配置器')
 
-    def gen_rpm_content(self) -> str:
-        '''生成rpm安装的脚本段
-        '''
-        names, yums, rpms = [], [], []
+    def set_configuration(self, configuration): self.__configuration = configuration
+    def get_configuration(self): return self.__configuration
+    configuration = property(get_configuration, set_configuration, None, '配置')
 
-        if self.__prof.install == InstallationMethodDefs.yum.name:
-            if rpm_name := self.__prof.extension.get('rpms'):
-                yums.append(rpm_name)
-            elif self.__prof.version:
-                yums.append(f"{self.__prof.name}-{self.__prof.version}")
-            else:
-                yums.append(self.__prof.name)
+    def set_previous_installation(self, previous_installation): self.__previous_installation = previous_installation
+    def get_previous_installation(self): return self.__previous_installation
+    previous_installation = property(get_previous_installation, set_previous_installation, None, '上一个安装器')
 
-        if self.__prof.install == InstallationMethodDefs.rpm.name:
-            if rpm_name := self.__prof.extension.get('rpms'):
-                rpms.append(rpm_name)
-            elif self.__prof.version:
-                rpms.append(f"{self.__prof.name}-{self.__prof.version}")
-            else:
-                rpms.append(self.__prof.name)
+    def gen_env_content(self, io:IO, cfg:Dict[str,Any], **kwargs):
+        if not cfg: return
+        if not io: return
 
-        names.append(self.__prof.name)
+        lines = []
 
-        return '\n'.join([
-            f'#--- Install {"".join(names)}' if names else '',
-            f'yum install -y {"".join(yums)}' if yums else '',
-            f'rpm -ivh {"".join(rpms)}' if rpms else ''
-        ]).strip()
+        c = self.configuration.copy()
+        c.update(install_dir = self.home)
+        c.update(kwargs)
 
-    def __str__(self) -> str:
-        return '\n'.join([self.before(), self.now(), self.after()]).strip()
+        catalog_cfg = cfg.get('catalog')
+        if catalog_cfg:
+            bin_dir,lib_dir = catalog_cfg.get('bin_dir'), catalog_cfg.get('lib_dir')
+            if bin_dir:
+                lines.append(f'export PATH=${{PATH}}:{bin_dir.format(**c)}')
+            if lib_dir:
+                lines.append(f'export LD_LIBRARY_PATH={lib_dir.format(**c)}:${{LD_LIBRARY_PATH}}')
+        
+        env = cfg.get('env')
+        if env:
+            for name,val in env.items():
+                lines.append(f"export {name}={val.format(**c)}")
 
-    def before(self) -> str:
-        return ''
+        if lines:
+            io.write('\n'.join([
+                'cat >> ${HOME}/.bashrc << EOF',
+                f'\n# {self.name}',
+                *lines,
+                'EOF'
+            ])
+            io.write('\n')
 
-    def now(self) -> str:
-        if self.__prof.install == InstallationMethodDefs.yum.name:
-            return self.gen_rpm_content()
-        elif self.__prof.install == InstallationMethodDefs.rpm.name:
-            return self.gen_rpm_content()
-        else:
-            return ''
+        def gen_scripts_content(self, io:IO, dist_dir:str, **kwargs):
+            if not cfg: return
+            if not io: return
 
-    def after(self) -> str:
-        return ''
+            c = self.configuration.copy()
+            c.update(install_dir = self.home)
+            c.update(dist_dir = dist_dir)
+            c.update(kwargs)
 
+            for script in self.configuration.get('scripts', []):
+                io.write(script.format(**c))
+                io.write('\n')
+
+    # def gen_rpm_content(self) -> str:
+    #     '''生成rpm安装的脚本段
+    #     '''
+    #     names, yums, rpms = [], [], []
+
+    #     if self.__prof.install == InstallationMethodDefs.yum.name:
+    #         if rpm_name := self.__prof.extension.get('rpms'):
+    #             yums.append(rpm_name)
+    #         elif self.__prof.version:
+    #             yums.append(f"{self.__prof.name}-{self.__prof.version}")
+    #         else:
+    #             yums.append(self.__prof.name)
+
+    #     if self.__prof.install == InstallationMethodDefs.rpm.name:
+    #         if rpm_name := self.__prof.extension.get('rpms'):
+    #             rpms.append(rpm_name)
+    #         elif self.__prof.version:
+    #             rpms.append(f"{self.__prof.name}-{self.__prof.version}")
+    #         else:
+    #             rpms.append(self.__prof.name)
+
+    #     names.append(self.__prof.name)
+
+    #     return 
+
+    # def __str__(self) -> str:
+    #     return '\n'.join([self.before(), self.now(), self.after()]).strip()
+
+    def before(self, io:IO):
+        pass
+
+    def now(self, io:IO):
+        pass
+
+    def after(self, io:IO):
+        pass
+
+    def draw(self, io:IO):
+        try:
+            self.before(io)
+        except:
+            traceback.print_exc()
+        try:
+            self.now(io)
+        except:
+            traceback.print_exc()
+        try:
+            self.after(io)
+        except:
+            traceback.print_exc()
+            
 class BasicGroupInstallation(object):
     def __init__(self):
-        self.__home = None
         self.__installations = []
 
-    def set_home(self, home:str): self.__home = home
-    def get_home(self) -> str: return self.__home
-    home = property(get_home, set_home, None, '根目录')
-
-    def put_application(self, installation:BasicAppInstallation):
+    def put_installation(self, installation:BasicInstallation):
         self.__installations.append(installation)
 
-    def __str__(self) -> str:
-        return '\n'.join([self.before(), self.now(), self.after()]).strip()
+    def before(self, io:IO):
+        pass
 
-    def before(self) -> str:
-        return ''
+    def after(self, io:IO):
+        pass
 
-    def now(self) -> str:
-        return '\n'.join([ str(i) for i in self.__installations ])
-
-    def after(self) -> str:
-        return ''
+    def draw(self, io:IO):
+        try:
+            self.before(io)
+        except:
+            traceback.print_exc()
+        try:
+            for installation in self.__installations:
+                installation.draw(io)
+        except:
+            traceback.print_exc()
+        try:
+            self.after(io)
+        except:
+            traceback.print_exc()
 
 # class GroupInstallationMeta(type):
 #     def __new__(cls, *args, **kwargs):

@@ -1,9 +1,10 @@
+# -*- coding:utf-8 -*-
+#!/usr/bin/env Python
+
 from enum import Enum,unique
 
 @unique
 class InstallationMethodDefs(Enum):
-    yum = 1
-    http = 2
-    filesystem = 3
-    rpm = 4
-    custom = 5
+    dnf = 1
+    bin = 2
+    ext = 3
