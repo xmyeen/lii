@@ -16,6 +16,13 @@ class Setting(object):
     excluding_installation_groups:List[str] = field(default_factory = list)
     profile: Dict[str,str] = field(default_factory = dict)
 
+    def get_image(self) -> Dict[str,str]:
+        return dict(
+            FROM = self.from_,
+            MAINTAINER = self.maintainer
+            fullname = self.get_full_name()
+        )
+
     def get_full_name(self):
         return f'{self.mirror}{self.mirror and "/"}{self.repo}/{self.name}:{self.tag}'
 

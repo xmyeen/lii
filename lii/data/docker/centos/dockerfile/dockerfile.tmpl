@@ -1,6 +1,6 @@
-FROM {image.from}
+FROM {image[FROM]}
 
-MAINTAINER {image.maintainer}
+MAINTAINER {image[MAINTAINER]}
 
 ENV LANG="zh_CN.UTF-8" LC_ALL="zh_CN.UTF-8" LANGUAGE="zh_CN:zh"
 
@@ -11,7 +11,7 @@ ADD {entrypoint_script} /docker-entrypoint.sh
 
 RUN \
     # 将编译时间加入登录提示
-    echo "{image.fullname} - built in `date "+%Y-%m-%dT%H:%M:%S%:z"`" >> /etc/motd; \
+    echo "{image[fullname]} - built in `date "+%Y-%m-%dT%H:%M:%S%:z"`" >> /etc/motd; \
     # 将环境变量写到/etc/profile里面，保证SSH登录的时候能够正确使用
     # 设置systemd可执行
     (cd /lib/systemd/system/sysinit.target.wants/; \

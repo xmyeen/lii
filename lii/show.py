@@ -38,7 +38,7 @@ def main():
             elif name in ("-o", "--output"):
                 cfg.update(output = value)
 
-        configurer = Configurer(mage)
+        configurer = Configurer(setting)
         configurer.init()
         for arg in args:
             content = configurer.get_configuration(ProfileDefs.from_file(arg))

@@ -40,16 +40,6 @@ class Installer(object):
     #     return f'{self.__work_dir}/.archives'
 
 
-    def __get_installation_configuration(self) -> Dict[str,Any]:
-        return dict(
-            image_from = self.__configurer.image_from,
-            image_maintainer = self.__configurer.image_maintainer,
-            image_name = self.__configurer.name,
-            http_server_addr = self.__server_addr,
-            http_server_port = self.__server_port,
-            installation_file = self.INSTALLATION_SCRIPT_NAME,
-            entrypoint_script_path = f'/{self.ENTRYPOINT_FILE_NAME}'
-        )
 
     def __gen_installation_content(self, io:IO) -> str:
         installer_cfg = self.__configurer.get_configuration(ProfileDefs.INSTALLATION_CONFIGURATION)
@@ -57,7 +47,7 @@ class Installer(object):
         group = {}
         for installation_cfg in installer_cfg.get("installations"):
             group_name = installation_cfg.get("group")
-            if group_name in self.__configurer.image.excluding_installation_groups:
+            if group_name in self.__configurer.setting.excluding_installation_groups:
                 #不包含的软件组，不进行安装
                 continue
             if group_name not in group: group.update({ group_name : [] })
@@ -110,9 +100,6 @@ class Installer(object):
         tempfile.NamedTemporaryFile() as installation_script_io, \
         tempfile.NamedTemporaryFile() as entrypoint_script_io, \
         tempfile.NamedTemporaryFile() as dockerfile_io: 
-        
-            # if "centos" == self.__configurer.lsb_release_name:
-            # if self.__configurer.image_from.startswith('centos'):
 
             installation_script_io.write(
                 self.__configurer.get_configuration(ProfileDefs.INSTALLATION).format(
@@ -127,7 +114,7 @@ class Installer(object):
 
             dockerfile_io.write(
                 self.__configurer.get_configuration(ProfileDefs.DOCKER_DOCKERFILE).format(
-                    image = self.__configurer.image,
+                    image = self.__configurer.get_image(),
                     installation_script = installation_script_io.name,
                     entrypoint_script = entrypoint_script_io.name
                 )
