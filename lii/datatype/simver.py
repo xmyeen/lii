@@ -2,7 +2,7 @@
 #!/usr/bin/env Python
 
 from dataclasses import dataclass
-from ..util.simver_util import cov_version
+from ..util.simver_utils import cov_version
 
 @dataclass
 class SimVer(object):

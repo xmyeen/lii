@@ -1,22 +1,22 @@
 #!/env/Python
 
-from ..common import insert_download_content
-from ....datatype.installation import BasicAppInstallation, app_d
+from ..common import gen_download_content
+from ....datatype.installation import BasicInstallation, app_d
 
-@app_d('maven')
-class MavenInstallation(BasicAppInstallation):
-    def __init__(self, *args, **kwargs):
-        BasicAppInstallation.__init__(self, *args, **kwargs)
+# @app_d('maven')
+# class MavenInstallation(BasicInstallation):
+#     def __init__(self, *args, **kwargs):
+#         BasicInstallation.__init__(self, *args, **kwargs)
 
-    def now(self):
-        lines =  [
-            '# maven installation',
+#     def now(self):
+#         lines =  [
+#             '# maven installation',
 
-            self.gen_rpm_content(),
+#             self.gen_rpm_content(),
 
-            'cat >> ${HOME}/.bashrc << EOF',
-            '# maven',
-            'EOF'
-        ]
+#             'cat >> ${HOME}/.bashrc << EOF',
+#             '# maven',
+#             'EOF'
+#         ]
 
-        return '\n'.join(lines).strip()
+#         return '\n'.join(lines).strip()

@@ -29,7 +29,7 @@ def main():
             elif name in ("--from"):
                 setting.from_ = value
             elif name in ("--lsb-release"):
-                if 0 < value.index(":"): continue
+                if 0 > value.index(":"): continue
                 setting.lsb_release_name, setting.lsb_release_version = value.split(":")
             elif name in ("--maintainer"):
                 setting.maintainer = value

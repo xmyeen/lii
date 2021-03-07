@@ -1,19 +1,24 @@
 #!/env/Python
 
-from ..common import insert_download_content
-from ....datatype.installation import BasicAppInstallation, app_d
+from typing import IO
+from urllib.parse import urlparse
+from ..common import gen_download_content
+from ....datatype.installation import BasicInstallation, app_d
 
 #/root/.local/share/virtualenvs/aliblab-zGTWfjcM/lib/python3.8/site-packages/pandas/compat/__init__.py:97: UserWarning: Could not import the lzma module. Your installed Python is incomplete. Attempting to use lzma compression will result in a RuntimeError
 
 @app_d('python')
-class PythonInstallation(BasicAppInstallation):
+class PythonInstallation(BasicInstallation):
     def __init__(self, *args, **kwargs):
-        BasicAppInstallation.__init__(self, *args, **kwargs)
+        BasicInstallation.__init__(self, *args, **kwargs)
 
-    def now(self):
-        lines = ['# python installation']
-        with insert_download_content(lines, self) as catalog_dir:
-            lines.extend([
+    def now(self, output:IO):
+        installation_as_ext_cfg = self.configuration.get('ext')
+        url = installation_as_ext_cfg.get('url').format(**self.configuration)
+        pypi = installation_as_ext_cfg.get('pypi')
+        pypi_url = urlparse(pypi)
+        with gen_download_content(output, url, self.work_dir) as catalog_dir:
+            output.write('\n'.join([
                 f'cd {catalog_dir}/Python-*',
                 f'./configure --prefix={self.home}',
                 'make',
@@ -22,12 +27,12 @@ class PythonInstallation(BasicAppInstallation):
                 'cat > /etc/pip.conf << EOF',
                 '[global]',
                 'timeout = 120',
-                'index-url = https://mirrors.aliyun.com/pypi/simple/',
+                f'index-url = {pypi}',
                 '[install]',
-                'trusted-host = mirrors.aliyun.com',
+                f'trusted-host = {pypi_url.netloc}',
                 'disable-pip-version-check = false',
                 '[download]',
-                'trusted-host = mirrors.aliyun.com',
+                f'trusted-host = {pypi_url.netloc}',
                 'disable-pip-version-check = false',
                 'EOF',
 
@@ -43,6 +48,6 @@ class PythonInstallation(BasicAppInstallation):
                 'EOF',
 
                 "cd - >/dev/null"
-            ])
-
-        return '\n'.join(lines).strip()
+            ]))
+            output.write('\n')
+            self.gen_scripts_content(output, dist_dir = self.home, cfg = installation_as_ext_cfg)

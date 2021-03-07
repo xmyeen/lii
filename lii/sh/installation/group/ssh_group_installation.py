@@ -1,6 +1,7 @@
 #!/env/Python
 
-from ..common import insert_download_content
+from typing import IO
+from ..common import gen_download_content
 from ....datatype.installation import BasicGroupInstallation, group_d
 
 AFTER_CONTENT_DEF = f'''
@@ -25,5 +26,9 @@ sed -i /etc/ssh/sshd_config \\
 
 @group_d('ssh')
 class SshGroupInstallation(BasicGroupInstallation):
-    def after(self) -> str:
-        return AFTER_CONTENT_DEF.strip()
+    def __init__(self):
+        BasicGroupInstallation.__init__(self)
+        
+    def after(self, output:IO) -> str:
+        output.write(AFTER_CONTENT_DEF.strip())
+        output.write('\n')

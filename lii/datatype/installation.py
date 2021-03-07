@@ -41,9 +41,9 @@ class BasicInstallation(object):
     def get_previous_installation(self): return self.__previous_installation
     previous_installation = property(get_previous_installation, set_previous_installation, None, '上一个安装器')
 
-    def gen_env_content(self, io:IO, cfg:Dict[str,Any], **kwargs):
+    def gen_env_content(self, output:IO, cfg:Dict[str,Any], **kwargs):
         if not cfg: return
-        if not io: return
+        if not output: return
 
         lines = []
 
@@ -51,89 +51,61 @@ class BasicInstallation(object):
         c.update(install_dir = self.home)
         c.update(kwargs)
 
-        catalog_cfg = cfg.get('catalog')
-        if catalog_cfg:
-            bin_dir,lib_dir = catalog_cfg.get('bin_dir'), catalog_cfg.get('lib_dir')
-            if bin_dir:
-                lines.append(f'export PATH=${{PATH}}:{bin_dir.format(**c)}')
-            if lib_dir:
-                lines.append(f'export LD_LIBRARY_PATH={lib_dir.format(**c)}:${{LD_LIBRARY_PATH}}')
-        
         env = cfg.get('env')
         if env:
             for name,val in env.items():
                 lines.append(f"export {name}={val.format(**c)}")
 
+        catalog_cfg = cfg.get('catalog')
+        if catalog_cfg:
+            bin_dir,lib_dir = catalog_cfg.get('bin_dir'), catalog_cfg.get('lib_dir')
+            if bin_dir:
+                lines.append(f'export PATH=\\${{PATH}}:{bin_dir.format(**c)}')
+            if lib_dir:
+                lines.append(f'export LD_LIBRARY_PATH={lib_dir.format(**c)}:\\${{LD_LIBRARY_PATH}}')
+        
+
         if lines:
-            io.write('\n'.join([
+            output.write('\n'.join([
                 'cat >> ${HOME}/.bashrc << EOF',
                 f'\n# {self.name}',
                 *lines,
                 'EOF'
             ]))
-            io.write('\n')
+            output.write('\n')
 
-        def gen_scripts_content(self, io:IO, dist_dir:str, **kwargs):
-            if not cfg: return
-            if not io: return
+    def gen_scripts_content(self, output:IO, dist_dir:str, cfg:Dict[str,Any], **kwargs):
+        if not output: return
 
-            c = self.configuration.copy()
-            c.update(install_dir = self.home)
-            c.update(dist_dir = dist_dir)
-            c.update(kwargs)
+        c = self.configuration.copy()
+        c.update(install_dir = self.home)
+        c.update(dist_dir = dist_dir)
+        c.update(kwargs)
 
-            for script in self.configuration.get('scripts', []):
-                io.write(script.format(**c))
-                io.write('\n')
+        for script in cfg.get('scripts', []):
+            output.write(script.format(**c))
+            output.write('\n')
 
-    # def gen_rpm_content(self) -> str:
-    #     '''生成rpm安装的脚本段
-    #     '''
-    #     names, yums, rpms = [], [], []
-
-    #     if self.__prof.install == InstallationMethodDefs.yum.name:
-    #         if rpm_name := self.__prof.extension.get('rpms'):
-    #             yums.append(rpm_name)
-    #         elif self.__prof.version:
-    #             yums.append(f"{self.__prof.name}-{self.__prof.version}")
-    #         else:
-    #             yums.append(self.__prof.name)
-
-    #     if self.__prof.install == InstallationMethodDefs.rpm.name:
-    #         if rpm_name := self.__prof.extension.get('rpms'):
-    #             rpms.append(rpm_name)
-    #         elif self.__prof.version:
-    #             rpms.append(f"{self.__prof.name}-{self.__prof.version}")
-    #         else:
-    #             rpms.append(self.__prof.name)
-
-    #     names.append(self.__prof.name)
-
-    #     return 
-
-    # def __str__(self) -> str:
-    #     return '\n'.join([self.before(), self.now(), self.after()]).strip()
-
-    def before(self, io:IO):
+    def before(self, output:IO):
         pass
 
-    def now(self, io:IO):
+    def now(self, output:IO):
         pass
 
-    def after(self, io:IO):
+    def after(self, output:IO):
         pass
 
-    def draw(self, io:IO):
+    def draw(self, output:IO):
         try:
-            self.before(io)
+            self.before(output)
         except:
             traceback.print_exc()
         try:
-            self.now(io)
+            self.now(output)
         except:
             traceback.print_exc()
         try:
-            self.after(io)
+            self.after(output)
         except:
             traceback.print_exc()
             
@@ -144,24 +116,25 @@ class BasicGroupInstallation(object):
     def put_installation(self, installation:BasicInstallation):
         self.__installations.append(installation)
 
-    def before(self, io:IO):
+    def before(self, output:IO):
         pass
 
-    def after(self, io:IO):
+    def after(self, output:IO):
         pass
 
-    def draw(self, io:IO):
+    def draw(self, output:IO):
         try:
-            self.before(io)
+            self.before(output)
         except:
             traceback.print_exc()
         try:
             for installation in self.__installations:
-                installation.draw(io)
+                output.write(f'--- {installation.name} install\n')
+                installation.draw(output)
         except:
             traceback.print_exc()
         try:
-            self.after(io)
+            self.after(output)
         except:
             traceback.print_exc()
 

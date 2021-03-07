@@ -1,12 +1,12 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/env Python
 
-import os, subprocess, json, enum, tempfile, csv
+import os,subprocess,json, enum, tempfile, csv
 from typing import Dict,Any
 from .en.lsb_release import LsbReleaseDefs
 from .en.installation import InstallationMethodDefs
 from .en.profile import ProfileDefs
-from .util.simver_util import cmpexp
+from .util.simver_utils import cmpexp
 from .datatype.setting import Setting
 from .datatype.simver import  SimVer
 
@@ -34,32 +34,32 @@ class Configurer(object):
         self.__data_file = {}
 
     @property
-    def setting(self): return self.__setting
+    def setting(self):
+        return self.__setting
 
     @property
-    def lsb_release_name(self): return self.__lsb_release_name
+    def lsb_release_name(self):
+        return self.__lsb_release_name
 
     @property
-    def lsb_release_version(self): return self.__lsb_release_version
-
-    # @property
-    # def installation_configuration(self): return self.__installation_configuration
+    def lsb_release_version(self):
+        return self.__lsb_release_version
 
     def __load_data_file(self):
         data_root = os.path.join(os.path.dirname(__file__), 'data', "docker")
         data_db = os.path.join(data_root, 'data.csv')
 
         self.__data_file.update({
-            ProfileDefs.INSTALLATION.value : os.path.join(data_root, self.__lsb_release_name, "install-cfg.json")
+            ProfileDefs.INSTALLATION_CONFIGURATION.value : os.path.join(data_root, self.__lsb_release_name, "install-cfg.json")
         })
-
-        with open(file, 'r', encoding='utf-8') as f:
-            self.__installation_configuration = json.load(f)
         
         with open(data_db, 'r', encoding='utf-8') as r:
             reader = csv.reader(r)
             for line in reader:
-                type_, os, p, exp = line
+                type_, os_, p, exp = line
+                if os_ != self.lsb_release_name:
+                    continue
+
                 if not cmpexp(str(self.lsb_release_version), exp):
                     continue
 
@@ -70,6 +70,7 @@ class Configurer(object):
             with tempfile.NamedTemporaryFile('w', encoding='utf-8') as tf:
                 tf.write('#!/bin/sh\n')
                 tf.write(LSB_LOOK_SCRIPTS_DEF)
+                tf.flush()
                 lsb_release_str = subprocess.getoutput(f'docker run --rm -it -v {os.path.abspath(tf.name)}:/run.sh {self.setting.from_} sh /run.sh')
                 if not lsb_release_str:
                     raise RuntimeError('No lsb_release found')
@@ -77,7 +78,6 @@ class Configurer(object):
                 self.__lsb_release_name, version_str = lsb_release_str.lower().split('-')
                 self.__lsb_release_version = SimVer.from_str(version_str)
 
-        self.__load_installation_configuration()
         self.__load_data_file()
 
     def get_configuration(self, profile_en:ProfileDefs) -> str:

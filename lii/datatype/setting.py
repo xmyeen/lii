@@ -24,7 +24,10 @@ class Setting(object):
         )
 
     def get_full_name(self):
-        return f'{self.mirror}{self.mirror and "/"}{self.repo}/{self.name}:{self.tag}'
+        if self.mirror:
+            return f'{self.mirror}/{self.repo}/{self.name}:{self.tag}'
+        else:
+            return f'{self.name}:{self.tag}'
 
     def set_full_name(self, full_name:str):
         mirror_repo_name, self.tag = full_name.split(':')

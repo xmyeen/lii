@@ -3,11 +3,6 @@
 # yum configuration
 centos_version=$(cat /etc/centos-release | cut -f4 -d' ' | cut -f'1' -d'.')
 {mirror_content}
-#echo "--- Add aliyun repository"
-#curl -k -s -L -o /etc/yum.repos.d/aliyun.repo https://mirrors.aliyun.com/repo/Centos-${centos_version}.repo
-#sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/aliyun.repo
-#echo "--- Add netease repository"
-#curl -k -s -L -o /etc/yum.repos.d/netease.repo https://mirrors.163.com/.help/CentOS${centos_version}-Base-163.repo
 yum makecache
 
 # language configuration
@@ -17,13 +12,13 @@ yum install -y kde-l10n-Chinese &&
 yum -q -y reinstall glibc-common && 
 localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
 
-cat >> ${HOME}/.bashrc <<EOF
+cat >> ${{HOME}}/.bashrc <<EOF
 # languages
 export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:zh
 export LC_ALL=zh_CN.UTF-8
 EOF
-source ${HOME}/.bashrc
+source ${{HOME}}/.bashrc
 
 # application installation
 {installation_content}

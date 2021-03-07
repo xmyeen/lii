@@ -1,11 +1,14 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/env Python
 
-import subprocess, os, sys, warnings, datetime, time, traceback, getopt
+import subprocess, os, sys, warnings, datetime, time, traceback, getopt, tempfile, json
+from io import StringIO
 # from urllib.parse import urlparse
 from functools import reduce
 from typing import Dict,Any, List, IO
 from .en.profile import ProfileDefs
+from .util.simver_utils import cov_version,cmpexp
+from .util.module_utils import scan_module
 from .datatype.setting import Setting
 from .datatype.installation import APP_INSTALLATION_TYPES, GROUP_INSTALLATION_TYPES, BasicInstallation, BasicGroupInstallation
 from .configurer import Configurer
@@ -30,7 +33,7 @@ class Installer(object):
 
     def __init__(self, configurer:Configurer):
         self.__configurer = configurer
-        self.__workdir = f'/tmp/lii-{int(time.time())}'
+        self.__installer_workdir = f'/tmp/lii-{int(time.time())}'
 
 
     # def __get_internal_mirror(self, name):
@@ -39,10 +42,30 @@ class Installer(object):
     # def archive_home(self) -> str:
     #     return f'{self.__work_dir}/.archives'
 
+    def __gen_mirror_content(self, io:IO):
+        installer_cfg = json.loads(self.__configurer.get_configuration(ProfileDefs.INSTALLATION_CONFIGURATION))
+        for mirror_cfg in installer_cfg.get(self.__configurer.lsb_release_name, {}).get('mirrors', []):
+            if not cmpexp(self.__configurer.lsb_release_version, mirror_cfg.get('version')):
+                continue
+
+            major,minor,patch,*_ = cov_version(self.__configurer.lsb_release_version).split('.')
+            file = mirror_cfg.get('file').format(
+                lsb_release_name = self.__configurer.lsb_release_name,
+                lsb_release_version = dict(
+                    major = major,
+                    minor = minor,
+                    patch = patch
+                )
+            )
+
+            name = mirror_cfg.get('name')
+            if 'centos' == self.__configurer.lsb_release_name:
+                io.write(f'# --- Add {name} repository\n')
+                io.write(f"curl -k -s -L -o /etc/yum.repos.d/{name}.repo {file}\n")
 
 
-    def __gen_installation_content(self, io:IO) -> str:
-        installer_cfg = self.__configurer.get_configuration(ProfileDefs.INSTALLATION_CONFIGURATION)
+    def __gen_installation_content(self, io:IO):
+        installer_cfg = json.loads(self.__configurer.get_configuration(ProfileDefs.INSTALLATION_CONFIGURATION))
         
         group = {}
         for installation_cfg in installer_cfg.get("installations"):
@@ -71,11 +94,11 @@ class Installer(object):
                     elif 'bin' == type_:
                         installation = BinaryInstallation()
                         installation.home = installation_cfg.get('home') or os.path.join("/opt", name, version)
-                        installation.work_dir = os.path.join(self.workdir, 'tmpdir', f'{name}.{type_}') 
+                        installation.work_dir = os.path.join(self.__installer_workdir, 'tmpdir', f'{name}.{type_}') 
                     elif 'ext' == type_:
                         installation = APP_INSTALLATION_TYPES.get(name)()
                         installation.home = installation_cfg.get('home') or os.path.join("/opt", name, version)
-                        installation.work_dir = os.path.join(self.workdir, 'tmpdir', f'{name}.{type_}') 
+                        installation.work_dir = os.path.join(self.__installer_workdir, 'tmpdir', f'{name}.{type_}') 
                     else:
                         print(f"No installation found for {type_}")
                         break
@@ -92,19 +115,23 @@ class Installer(object):
         dockerfile_content, installation_content = None, None
         # installation_cfg = self.__get_installation_configuration()
 
+        mirror_content_io = StringIO()
+        self.__gen_mirror_content(mirror_content_io)
+        mirror_content_io.seek(0)
+
         installation_content_io = StringIO()
         self.__gen_installation_content(installation_content_io)
         installation_content_io.seek(0)
 
         with \
-        tempfile.NamedTemporaryFile() as installation_script_io, \
-        tempfile.NamedTemporaryFile() as entrypoint_script_io, \
-        tempfile.NamedTemporaryFile() as dockerfile_io: 
+        tempfile.NamedTemporaryFile('w', encoding='utf-8') as installation_script_io, \
+        tempfile.NamedTemporaryFile('w', encoding='utf-8') as entrypoint_script_io, \
+        tempfile.NamedTemporaryFile('w', encoding='utf-8') as dockerfile_io: 
 
             installation_script_io.write(
                 self.__configurer.get_configuration(ProfileDefs.INSTALLATION).format(
-                    mirror_content = "",
-                    installation_content = sio.read()
+                    mirror_content = mirror_content_io.read(),
+                    installation_content = installation_content_io.read()
                 )
             )
 
@@ -114,9 +141,10 @@ class Installer(object):
 
             dockerfile_io.write(
                 self.__configurer.get_configuration(ProfileDefs.DOCKER_DOCKERFILE).format(
-                    image = self.__configurer.get_image(),
+                    image = self.__configurer.setting.get_image(),
                     installation_script = installation_script_io.name,
-                    entrypoint_script = entrypoint_script_io.name
+                    entrypoint_script = entrypoint_script_io.name,
+                    installation_label = 'lii'
                 )
             )
 
@@ -130,7 +158,7 @@ class Installer(object):
                     '--build-arg HTTP_PROXY=${HTTP_PROXY}',
                     '--build-arg HTTPS_PROXY=${HTTPS_PROXY}',
                     # f'--build-arg builder_sh={os.path.basename(software_script_f.name)}',
-                    f'-t {self.__configurer.name}:{self.__configurer.version}',
+                    f'-t {self.__configurer.setting.name}:{self.__configurer.setting.tag}',
                     f'-f {dockerfile_io.name}',
                     "."
                 ])
@@ -170,7 +198,7 @@ def main():
             elif name in ("--from"):
                 setting.from_ = value
             elif name in ("--lsb-release"):
-                if 0 < value.index(":"): continue
+                if 0 > value.index(":"): continue
                 setting.lsb_release_name, setting.lsb_release_version = value.split(":")
             elif name in ("--maintainer"):
                 setting.maintainer = value
@@ -181,14 +209,16 @@ def main():
             elif name in ("--dockerfile", "--docker-entrypoint", "--installation", "--install-cfg"):
                 setting.profile.update({ name[2:] : value })
 
-        scan_module(__loader__.name.replace('__main__', "sh.installation"))
+        # print(__loader__.name)
+        # scan_module(__loader__.name.replace('__main__', "sh.installation"))
+        scan_module('lii.sh.installation')
 
         configurer = Configurer(setting)
         configurer.init()
         installer = Installer(configurer)
 
         with tempfile.TemporaryDirectory() as td:
-            Installer.exec(td)
+            installer.exec(td)
 
     except SystemExit as ex:
         if 0 != ex.code:

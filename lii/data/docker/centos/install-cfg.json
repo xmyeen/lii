@@ -61,7 +61,12 @@
         {
             "name": "git",
             "group": "cvs",
-            "install": "dnf"
+            "install": "dnf",
+            "dnf": {
+                "scripts": [
+                    "git config --global http.sslVerify false"
+                ]
+            }
         },
         {
             "name": "svn",
@@ -95,13 +100,13 @@
             "install": "bin",
             "version": "3.15.2",
             "bin": {
-                "url": "https://github.com/Kitware/CMake/releases/download/v{{version}}/cmake-{{version}}-Linux-x86_64.tar.gz",
+                "url": "https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-Linux-x86_64.tar.gz",
                 "scripts": [
-                    "mv -f {{dist_dir}}/cmake-*-Linux-* {{install_dir}}"
+                    "mv -f {dist_dir}/cmake-*-Linux-* {install_dir}"
                 ],
                 "catalog": {
-                    "bin_dir": "{{install_dir}}/bin",
-                    "lib_dir": "{{install_dir}}/lib"
+                    "bin_dir": "{install_dir}/bin",
+                    "lib_dir": "{install_dir}/lib"
                 },
                 "env": null
             }
@@ -122,7 +127,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -130,7 +135,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -138,7 +143,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -146,7 +151,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -154,7 +159,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -162,7 +167,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -170,7 +175,7 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
@@ -178,16 +183,17 @@
             "group": "python-devel",
             "install": "dnf",
             "dnf": {
-                "pkg": "{{name}}-devel"
+                "pkg": "{name}-devel"
             }
         },
         {
             "name": "python",
             "group": "python-devel",
-            "install": "bin+ext",
+            "install": "ext",
             "version": "3.9.2",
-            "bin": {
-                "url": "https://www.python.org/ftp/python/{{version}}/Python-{{version}}.tar.xz"
+            "ext": {
+                "url": "https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz",
+                "pypi": "https://mirrors.aliyun.com/pypi/simple/"
             }
         },
 
@@ -197,13 +203,13 @@
             "install": "bin",
             "version": "14.15.5",
             "bin": {
-                "url": "https://nodejs.org/dist/v{{version}}/node-v{{version}}-linux-x64.tar.xz",
+                "url": "https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz",
                 "scripts": [
-                    "mv -f {{dist_dir}}/node-*-Linux-* {{install_dir}}"
+                    "mv -f {dist_dir}/node-*-Linux-* {install_dir}"
                 ],
                 "catalog": {
-                    "bin_dir": "{{install_dir}}/bin",
-                    "lib_dir": "{{install_dir}}/lib"
+                    "bin_dir": "{install_dir}/bin",
+                    "lib_dir": "{install_dir}/lib"
                 },
                 "env": null
             }
@@ -227,20 +233,18 @@
             "group": "golang-devel",
             "install": "bin",
             "version": "1.4",
-            "env": {
-                "GO_WORKSPACE": "${HOME}/.gowork"
-            },
             "bin": {
-                "url": "https://mirrors.ustc.edu.cn/golang/go{{version}}.linux-amd64.tar.gz",
+                "url": "https://mirrors.ustc.edu.cn/golang/go{version}.linux-amd64.tar.gz",
                 "scripts": [
-                    "mv -f {{dist_dir}}/go {{install_dir}}",
-                    "mkdir -p ${GO_WORKSPACE}"
+                    "mv -f {dist_dir}/go {install_dir}",
+                    "source ${{HOME}}/.bashrc",
+                    "mkdir -p ${{GOPATH}}"
                 ],
                 "catalog": {
-                    "bin_dir": "{{install_dir}}/bin"
+                    "bin_dir": "{install_dir}/bin"
                 },
                 "env": {
-                    "GOPATH": "{{env[GO_WORKSPACE]}}"
+                    "GOPATH": "${{HOME}}/devel/gowork"
                 }
             }
         },
@@ -248,16 +252,16 @@
         {
             "name": "openjdk",
             "group": "java-devel",
-            "install": "dnf+ext",
+            "install": "dnf",
             "version": "11",
             "dnf": {
-                "pkg": "java-{{version}}-{{name}} java-{{version}}-{{name}}-devel",
+                "pkg": "java-{version}-{name} java-{version}-{name}-devel",
                 "catalog": {
-                    "bin_dir": "{{install_dir}}/bin"
+                    "bin_dir": "${{JAVA_HOME}}/bin"
                 },
                 "env": {
-                    "JAVA_HOME": "/usr/lib/jvm/java-{{version}-openjdk/",
-                    "CLASSPATH": "CLASSPATH=.:${JAVA_HOME}/lib:${JAVA_HOME}/lib/dt.jar:${JAVA_HOME}/lib/tools.jar"
+                    "JAVA_HOME": "/usr/lib/jvm/java-{version}-openjdk/",
+                    "CLASSPATH": ".:\\${{JAVA_HOME}}/lib:\\${{JAVA_HOME}}/lib/dt.jar:\\${{JAVA_HOME}}/lib/tools.jar"
                 }
             }
         },
@@ -274,7 +278,7 @@
             "install": "dnf",
             "version": "1.1.0", 
             "dnf": {
-                "pkg": "https://github.com/xmyeen/fvs/releases/download/{{version}}-beta.1/fvs-{{version}}-1.el7.noarch.rpm"
+                "pkg": "https://github.com/xmyeen/fvs/releases/download/{version}-beta.1/fvs-{version}-1.el7.noarch.rpm"
             }
         }
     ],
@@ -283,12 +287,12 @@
         "mirrors": [
             {
                 "name": "aliyun",
-                "file": "https://mirrors.aliyun.com/repo/Centos-{lsb_release_version.major}.repo",
+                "file": "https://mirrors.aliyun.com/repo/Centos-{lsb_release_version[major]}.repo",
                 "version": ">=7"
             },
             {
                 "name": "netease",
-                "file": "https://mirrors.163.com/.help/CentOS{lsb_release_version.major}-Base-163.repo",
+                "file": "https://mirrors.163.com/.help/CentOS{lsb_release_version[major]}-Base-163.repo",
                 "version": ">=7"
             }
         ]

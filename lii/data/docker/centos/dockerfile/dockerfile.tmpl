@@ -24,11 +24,8 @@ RUN \
     rm -f /lib/systemd/system/basic.target.wants/*; \
     rm -f /lib/systemd/system/anaconda.target.wants/*; \
     # 执行安装脚本
-    #curl -ssL http://{http_server_addr}:{http_server_port}/{installation_file} | sh; \
     sh /tmp/install.sh \
     # 安装启动脚本
-    #dirname {entrypoint_script_path} | xargs mkdir -p; \
-    #basename {entrypoint_script_path} | xargs -i curl -ssL -o {entrypoint_script_path} http://{http_server_port}:{http_server_port}/{{}} | sh; \
     chmod 755 /docker-entrypoint.sh; \
     echo "--- show entry point" && \
     cat /docker-entrypoint.sh && \
@@ -39,6 +36,6 @@ EXPOSE 22 80 8080
 
 VOLUME [ "/sys/fs/cgroup" ]
 
-CMD ["{entrypoint_script_path}"]
+CMD ["/docker-entrypoint.sh"]
 # CMD ["/usr/sbin/sshd -D"]
 # CMD ["/usr/sbin/init"]]
