@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/env Python
 
-import subprocess, os, sys, warnings, datetime, time, traceback
+import subprocess, os, sys, warnings, datetime, time, traceback, getopt
 # from urllib.parse import urlparse
 from functools import reduce
 from typing import Dict,Any, List, IO
@@ -107,10 +107,10 @@ class Installer(object):
         installation_content_io.seek(0)
 
         with \
-            tempfile.NamedTemporaryFile() as installation_script_io, \
-            tempfile.NamedTemporaryFile() as entrypoint_script_io \
-            tempfile.NamedTemporaryFile() as dockerfile_io: 
-            
+        tempfile.NamedTemporaryFile() as installation_script_io, \
+        tempfile.NamedTemporaryFile() as entrypoint_script_io, \
+        tempfile.NamedTemporaryFile() as dockerfile_io: 
+        
             # if "centos" == self.__configurer.lsb_release_name:
             # if self.__configurer.image_from.startswith('centos'):
 
@@ -178,7 +178,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[2:], "h", ["help", "from=", "lsb-release=", "maintainer=", "name=", "exclude=", "install-cfg=", "dockerfile=", "docker-entrypoint=", "installation="])
         for name, value in opts:
             if name in ("-h", "--help"):
-                print(usage())
+                print(usage(setting))
                 sys.exit(0)
             elif name in ("--from"):
                 setting.from_ = value
@@ -194,7 +194,9 @@ def main():
             elif name in ("--dockerfile", "--docker-entrypoint", "--installation", "--install-cfg"):
                 setting.profile.update({ name[2:] : value })
 
-        configurer = Configurer(mage)
+        scan_module(__loader__.name.replace('__main__', "sh.installation"))
+
+        configurer = Configurer(setting)
         configurer.init()
         installer = Installer(configurer)
 

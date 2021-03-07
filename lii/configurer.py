@@ -2,7 +2,7 @@
 #!/usr/bin/env Python
 
 import os, subprocess, json, enum, tempfile, csv
-from tying import Dict,Any
+from typing import Dict,Any
 from .en.lsb_release import LsbReleaseDefs
 from .en.installation import InstallationMethodDefs
 from .en.profile import ProfileDefs
@@ -59,7 +59,7 @@ class Configurer(object):
         with open(data_db, 'r', encoding='utf-8') as r:
             reader = csv.reader(r)
             for line in reader:
-                type_, os, p, exp = *line
+                type_, os, p, exp = line
                 if not cmpexp(str(self.lsb_release_version), exp):
                     continue
 

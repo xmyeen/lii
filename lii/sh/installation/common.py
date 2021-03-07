@@ -1,5 +1,5 @@
 import os, uuid, warnings
-from typing import List, str, Any
+from typing import List, Any, IO
 from contextlib import contextmanager
 # from ...datatype.app_prof import AppProf
 from ...datatype.installation import BasicInstallation

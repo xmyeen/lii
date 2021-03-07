@@ -1,11 +1,12 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/env Python
 
+import sys
 from .show import main as do_show
 from .installer import main as do_install
 # import sys, warnings, traceback, getopt, tempfile
 # from .util.module_utils import scan_module
-# scan_module(__loader__.name.replace('__main__', "sh.installation"))
+# 
 
 def usage():
     return '\n'.join([
@@ -16,13 +17,13 @@ def usage():
     ])
 
 if 1 == len(sys.argv):
-    usage()
+    print(usage())
 if 'show' == sys.argv[1]:
     do_show()
 elif 'install' == sys.argv[1]:
     do_install()
 else:
-    usage()
+    print(usage())
 
 # USAGE_DEF = f'''
 # python -m lii [option]

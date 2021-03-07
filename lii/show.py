@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/env Python
 
-import sys,os,traceback,json
+import sys,os,traceback,json, getopt
 from .en.profile import ProfileDefs
 from .datatype.setting import Setting
 from .configurer import Configurer
@@ -24,7 +24,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[2:], "ho:", ["help", "from=", "lsb-release=", "maintainer=", "name=", "output="])
         for name, value in opts:
             if name in ("-h", "--help"):
-                print(usage())
+                print(usage(setting))
                 sys.exit(0)
             elif name in ("--from"):
                 setting.from_ = value

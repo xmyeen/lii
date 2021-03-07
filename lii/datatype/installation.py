@@ -3,7 +3,7 @@
 
 # from typing  import 
 import traceback
-from typing import Dict,Any,List
+from typing import Dict,Any,List,IO
 from abc import ABCMeta, abstractclassmethod
 from ..en.installation import InstallationMethodDefs
 
@@ -70,7 +70,7 @@ class BasicInstallation(object):
                 f'\n# {self.name}',
                 *lines,
                 'EOF'
-            ])
+            ]))
             io.write('\n')
 
         def gen_scripts_content(self, io:IO, dist_dir:str, **kwargs):
