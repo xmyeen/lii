@@ -8,13 +8,12 @@ from .installer import main as do_install
 # scan_module(__loader__.name.replace('__main__', "sh.installation"))
 
 def usage():
-    return f'''
-    lii <sub_command> [options] [arguments]
-
-    Sub Commands:
-    show                        Show profile
-    install                     Install
-    '''
+    return '\n'.join([
+        f'lii <sub_command> [options] [arguments]',
+        f'Sub Commands:',
+        f'show                        Show profile',
+        f'install                     Install'
+    ])
 
 if 1 == len(sys.argv):
     usage()
