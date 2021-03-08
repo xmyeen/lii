@@ -129,7 +129,7 @@ class BasicGroupInstallation(object):
             traceback.print_exc()
         try:
             for installation in self.__installations:
-                output.write(f'--- {installation.name} install\n')
+                output.write(f'echo "--- {installation.name} install"\n')
                 installation.draw(output)
         except:
             traceback.print_exc()
