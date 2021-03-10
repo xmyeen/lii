@@ -7,7 +7,7 @@ from io import StringIO
 from functools import reduce
 from typing import Dict,Any, List, IO
 from .en.profile import ProfileDefs
-from .util.simver_utils import cov_version,cmpexp
+from .util.semver_utils import cov_version,cmpexp
 from .util.module_utils import scan_module
 from .datatype.setting import Setting
 from .datatype.installation import APP_INSTALLATION_TYPES, GROUP_INSTALLATION_TYPES, BasicInstallation, BasicGroupInstallation

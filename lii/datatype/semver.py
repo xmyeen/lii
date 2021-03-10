@@ -2,17 +2,17 @@
 #!/usr/bin/env Python
 
 from dataclasses import dataclass
-from ..util.simver_utils import cov_version
+from ..util.semver_utils import cov_version
 
 @dataclass
-class SimVer(object):
+class semver(object):
     major: int = 0
     minor: int = 0
     patch: int = 0
 
     @staticmethod
-    def from_str(v:str) -> 'SimVer':
-        sv = SimVer()
+    def from_str(v:str) -> 'semver':
+        sv = semver()
         sv.major, sv.minor, sv.patch, *_ = cov_version(v).split(".")
         return sv
 

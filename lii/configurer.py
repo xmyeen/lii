@@ -6,9 +6,9 @@ from typing import Dict,Any
 from .en.lsb_release import LsbReleaseDefs
 from .en.installation import InstallationMethodDefs
 from .en.profile import ProfileDefs
-from .util.simver_utils import cmpexp
+from .util.semver_utils import cmpexp
 from .datatype.setting import Setting
-from .datatype.simver import  SimVer
+from .datatype.semver import  semver
 
 LSB_LOOK_SCRIPTS_DEF = f'''
 if [ -e {LsbReleaseDefs.REDHAT.value} ]
@@ -76,7 +76,7 @@ class Configurer(object):
                     raise RuntimeError('No lsb_release found')
 
                 self.__lsb_release_name, version_str = lsb_release_str.lower().split('-')
-                self.__lsb_release_version = SimVer.from_str(version_str)
+                self.__lsb_release_version = semver.from_str(version_str)
 
         self.__load_data_file()
 
