@@ -1,0 +1,3 @@
+"dockerfile","centos","centos/dockerfile/dockerfile.tmpl",">=7"
+"docker-entrypoint","centos","centos/entrypoint/docker-entrypoint.sh",">=7"
+"installation","centos","centos/installation/installation.sh",">=7"

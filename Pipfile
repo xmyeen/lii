@@ -1,0 +1,13 @@
+[scripts]
+install = "python setup.py sdist install"
+build = "python setup.py bdist_wheel build"
+upload = "python setup.py sdist bdist_wheel clean --all upload"
+tests = "python -m pytest"
+
+[dev-packages]
+
+[packages]
+lii = {editable = true, path = "."}
+
+[requires]
+python_version = "3.8"

@@ -1,0 +1,41 @@
+FROM {image[FROM]}
+
+MAINTAINER {image[MAINTAINER]}
+
+ENV LANG="zh_CN.UTF-8" LC_ALL="zh_CN.UTF-8" LANGUAGE="zh_CN:zh"
+
+LABEL description="多开发语言统一构建环境" installation="{installation_label}"
+
+ADD {installation_script} /tmp/install.sh
+ADD {entrypoint_script} /docker-entrypoint.sh
+
+RUN \
+    # 将编译时间加入登录提示
+    echo "{image[fullname]} - built in `date "+%Y-%m-%dT%H:%M:%S%:z"`" >> /etc/motd; \
+    # 将环境变量写到/etc/profile里面，保证SSH登录的时候能够正确使用
+    # 设置systemd可执行
+    (cd /lib/systemd/system/sysinit.target.wants/; \
+    for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /lib/systemd/system/multi-user.target.wants/*; \
+    rm -f /etc/systemd/system/*.wants/*; \
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*; \
+    rm -f /lib/systemd/system/anaconda.target.wants/*; \
+    # 执行安装脚本
+    sh /tmp/install.sh \
+    # 安装启动脚本
+    chmod 755 /docker-entrypoint.sh; \
+    echo "--- show entry point" && \
+    cat /docker-entrypoint.sh && \
+    echo "--- all done"
+    
+
+EXPOSE 22 80 8080
+
+VOLUME [ "/sys/fs/cgroup" ]
+
+CMD ["/docker-entrypoint.sh"]
+# CMD ["/usr/sbin/sshd -D"]
+# CMD ["/usr/sbin/init"]]

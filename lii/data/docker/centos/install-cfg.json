@@ -1,0 +1,300 @@
+{
+    "installations": [
+        {
+            "name": "sysvinit-tools",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "vim",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "unzip",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "bzip2",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "rpm-build",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "createrepo",
+            "group": "basic",
+            "install": "dnf"
+        },
+
+        {
+            "name": "openssh",
+            "group": "ssh",
+            "install": "dnf"
+        },
+        {
+            "name": "openssh-server",
+            "group": "ssh",
+            "install": "dnf"
+        },
+        {
+            "name": "openssh-client",
+            "group": "ssh",
+            "install": "dnf"
+        },
+
+        {
+            "name": "iproute",
+            "group": "basic",
+            "install": "dnf"
+        },
+        {
+            "name": "NetworkManager",
+            "group": "basic",
+            "install": "dnf"
+        },
+
+        {
+            "name": "git",
+            "group": "cvs",
+            "install": "dnf",
+            "dnf": {
+                "scripts": [
+                    "git config --global http.sslVerify false"
+                ]
+            }
+        },
+        {
+            "name": "svn",
+            "group": "cvs",
+            "install": "dnf"
+        },
+
+        {
+            "name": "gcc",
+            "group": "cpp-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "gcc-c++",
+            "group": "cpp-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "make",
+            "group": "cpp-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "glibc",
+            "group": "cpp-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "cmake",
+            "group": "cpp-devel",
+            "install": "bin",
+            "version": "3.15.2",
+            "bin": {
+                "url": "https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}-Linux-x86_64.tar.gz",
+                "scripts": [
+                    "mv -f {dist_dir}/cmake-*-Linux-* {install_dir}"
+                ],
+                "catalog": {
+                    "bin_dir": "{install_dir}/bin",
+                    "lib_dir": "{install_dir}/lib"
+                },
+                "env": null
+            }
+        },
+
+        {
+            "name": "zlib",
+            "group": "python-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "lzma",
+            "group": "python-devel",
+            "install": "dnf"
+        },
+        {
+            "name": "xz",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "openssl",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "ncurses",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "sqlite",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "readline",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "gdm",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "tk",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "libffi",
+            "group": "python-devel",
+            "install": "dnf",
+            "dnf": {
+                "pkg": "{name}-devel"
+            }
+        },
+        {
+            "name": "python",
+            "group": "python-devel",
+            "install": "ext",
+            "version": "3.9.2",
+            "ext": {
+                "url": "https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz",
+                "pypi": "https://mirrors.aliyun.com/pypi/simple/"
+            }
+        },
+
+        {
+            "name": "node",
+            "group": "javascript-devel",
+            "install": "bin",
+            "version": "14.15.5",
+            "bin": {
+                "url": "https://nodejs.org/dist/v{version}/node-v{version}-linux-x64.tar.xz",
+                "scripts": [
+                    "mv -f {dist_dir}/node-*-Linux-* {install_dir}"
+                ],
+                "catalog": {
+                    "bin_dir": "{install_dir}/bin",
+                    "lib_dir": "{install_dir}/lib"
+                },
+                "env": null
+            }
+        },
+
+        {
+            "name": "rust",
+            "group": "rust-devel",
+            "install": "ext",
+            "env": {
+                "RUSTUP_REGISTRY": "mirrors.ustc.edu.cn",
+                "RUSTUP_REGISTRY_NAME": "utsc"
+            },
+            "ext": {
+                "version": "latest"
+            }
+        },
+
+        {
+            "name": "golang",
+            "group": "golang-devel",
+            "install": "bin",
+            "version": "1.4",
+            "bin": {
+                "url": "https://mirrors.ustc.edu.cn/golang/go{version}.linux-amd64.tar.gz",
+                "scripts": [
+                    "mv -f {dist_dir}/go {install_dir}",
+                    "source ${{HOME}}/.bashrc",
+                    "mkdir -p ${{GOPATH}}"
+                ],
+                "catalog": {
+                    "bin_dir": "{install_dir}/bin"
+                },
+                "env": {
+                    "GOPATH": "${{HOME}}/devel/gowork"
+                }
+            }
+        },
+
+        {
+            "name": "openjdk",
+            "group": "java-devel",
+            "install": "dnf",
+            "version": "11",
+            "dnf": {
+                "pkg": "java-{version}-{name} java-{version}-{name}-devel",
+                "catalog": {
+                    "bin_dir": "${{JAVA_HOME}}/bin"
+                },
+                "env": {
+                    "JAVA_HOME": "/usr/lib/jvm/java-{version}-openjdk/",
+                    "CLASSPATH": ".:\\${{JAVA_HOME}}/lib:\\${{JAVA_HOME}}/lib/dt.jar:\\${{JAVA_HOME}}/lib/tools.jar"
+                }
+            }
+        },
+
+        {
+            "name": "maven",
+            "group": "java-devel",
+            "install": "dnf"
+        },
+
+        {
+            "name": "fvs",
+            "group": "toolkit",
+            "install": "dnf",
+            "version": "1.1.0", 
+            "dnf": {
+                "pkg": "https://github.com/xmyeen/fvs/releases/download/{version}-beta.1/fvs-{version}-1.el7.noarch.rpm"
+            }
+        }
+    ],
+    
+    "centos": {
+        "mirrors": [
+            {
+                "name": "aliyun",
+                "file": "https://mirrors.aliyun.com/repo/Centos-{lsb_release_version[major]}.repo",
+                "version": ">=7"
+            },
+            {
+                "name": "netease",
+                "file": "https://mirrors.163.com/.help/CentOS{lsb_release_version[major]}-Base-163.repo",
+                "version": ">=7"
+            }
+        ]
+    }
+}
